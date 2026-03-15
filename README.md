@@ -1,5 +1,9 @@
 # llmBench - Professional Hardware & LLM Analytics Suite
 
+<p align="center">
+  <img width="801" height="550" alt="Image" src="https://github.com/user-attachments/assets/6c61265e-68c3-42a0-a472-822f7eaae3a4" />
+</p>
+
 llmBench is a high-depth benchmarking tool designed to measure the raw performance of local LLM runtimes (Ollama, llama.cpp) while providing deep hardware intelligence. Unlike standard benchmarks, llmBench maps your local performance against the **LMSYS Chatbot Arena** global leaderboard using parameter-aware estimation.
 
 ## ✨ Core Features
