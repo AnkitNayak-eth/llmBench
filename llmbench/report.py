@@ -149,7 +149,26 @@ def show_results(report, all_models=None, show_hardware=True):
     perf_table.add_row("Stream Velocity", f"[bold bright_green]{p.get('tokens_sec', 0)} tokens/sec[/bold bright_green]")
     perf_table.add_row("Compute Intensity", f"[bold bright_green]{gflops} GFLOPS ({params}B Scale)[/bold bright_green]")
     perf_table.add_row("Memory Bandwidth", f"[bold bright_green]{bw_est} GB/s Est.[/bold bright_green]")
-    perf_table.add_row("Peak VRAM Δ", f"[bold bright_green]+{p.get('peak_vram_gb', 0)} GB[/bold bright_green]")
+    v_delta = p.get('peak_vram_gb', 0)
+    v_abs = p.get('vram_absolute_gb', 0)
+    v_status = p.get('vram_residency', 'N/A')
+    
+    # Precise terminal feedback
+    v_display = f"+{v_delta} GB ({v_status})"
+    if v_status == "Stay-Resident":
+        v_display = f"Stay-Resident (~{v_delta} GB Δ)"
+        
+    perf_table.add_row("Peak VRAM Δ", f"[bold bright_green]{v_display}[/bold bright_green]")
+    perf_table.add_row("Active VRAM Load", f"[bright_green]{v_abs} GB System Total[/bright_green]")
+    
+    perf_table.add_section()
+    perf_table.add_row("Model Load Latency", f"[bright_green]{p.get('load_time', 0)}s[/bright_green]")
+    perf_table.add_row("Context Prefill", f"[bright_green]{p.get('prompt_eval_rate', 0)} tokens/sec[/bright_green]")
+    perf_table.add_row("Char Throughput", f"[bright_green]{p.get('chars_per_sec', 0)} chars/sec[/bright_green]")
+    perf_table.add_row("Input Context", f"[bright_green]{p.get('prompt_tokens', 0)} tokens[/bright_green]")
+    perf_table.add_row("Total Sequence", f"[bright_green]{p.get('latency', 0)}s[/bright_green]")
+
+    perf_table.add_section()
     perf_table.add_row("Energy Footprint", f"[bright_green]{p.get('total_energy_kj', 0)} Kilojoules (KJ)[/bright_green]")
     perf_table.add_row("Inference Power", f"[bright_green]{p.get('avg_power_w', 0)}W Avg[/bright_green]")
     perf_table.add_row("Joules Per Token", f"[bright_green]{p.get('joules_token', 0)} J/Token[/bright_green]")

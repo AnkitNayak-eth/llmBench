@@ -26,9 +26,6 @@ def run_benchmark(model):
     
     latency = end_time - start_time
     vram_delta = round(max(0, end_vram - start_vram), 2)
-    temp_delta = round(max(0, end_temp - start_temp), 1)
-    avg_pwr = round((start_pwr + end_pwr) / 2, 2)
-    
     response_text = out.get("response") or out.get("content") or ""
     
     prompt_eval_duration = out.get("prompt_eval_duration", 0) / 1e9
@@ -37,6 +34,18 @@ def run_benchmark(model):
     prompt_eval_count = out.get("prompt_eval_count", 0)
     load_duration = out.get("load_duration", 0) / 1e9
     total_duration = out.get("total_duration", 0) / 1e9
+    
+    # Residency Detection
+    # If the VRAM delta is zero, the model was already in the GPU memory.
+    if vram_delta < 0.02:
+        residency_status = "Stay-Resident"
+    elif load_duration > 1.0:
+        residency_status = "Cold Start"
+    else:
+        residency_status = "Dynamic"
+    
+    temp_delta = round(max(0, end_temp - start_temp), 1)
+    avg_pwr = round((start_pwr + end_pwr) / 2, 2)
     
     if eval_count == 0:
         eval_count = len(response_text.split())
@@ -78,6 +87,8 @@ def run_benchmark(model):
         "chars_per_token": round(chars_per_token, 2),
         "chars_per_sec": round(chars_per_sec, 2),
         "peak_vram_gb": vram_delta,
+        "vram_absolute_gb": end_vram,
+        "vram_residency": residency_status,
         "thermal_delta": temp_delta,
         "thermal_velocity": thermal_velocity,
         "avg_power_w": avg_pwr,
